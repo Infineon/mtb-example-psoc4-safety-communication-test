@@ -174,7 +174,7 @@ int main(void)
             /* Slave have a marker
              * analyze received data and prepare respond */
             slave_resp_res = UartMesSlave_Respond((uint8_t *)UartMesSlave_GetDataPtr(), UartMesSlave_GetDataSize());
-            if(!slave_resp_res)
+            if(slave_resp_res)
             {
                 CY_ASSERT(0);
             }

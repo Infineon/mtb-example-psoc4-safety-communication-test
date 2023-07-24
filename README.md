@@ -258,6 +258,7 @@ Document title: *CE238029* - *PSoC&trade; 4 class-B safety test: Communication p
  Version | Description of change
  ------- | ---------------------
  0.1.0   | Alpha release version
+ 0.1.1   | minor bug fix
 <br>
 
 ---------------------------------------------------------
