@@ -12,7 +12,7 @@
 * Related Document:See README.md
 *
 ********************************************************************************
-* Copyright 2023, Cypress Semiconductor Corporation (an Infineon company) or
+* Copyright 2023-2024, Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
@@ -51,9 +51,8 @@
 #include "cy_pdl.h"
 #include "cybsp.h"
 #include "cy_retarget_io.h"
-
-#include "UART_master_message.h"
-#include "UART_slave_message.h"
+#include "SelfTest_UART_slave_message.h"
+#include "SelfTest_UART_master_message.h"
 
 /*******************************************************************************
 * Macros
@@ -64,7 +63,20 @@
 /*******************************************************************************
 * Global Variables
 *******************************************************************************/
+#define RX_TEST_SIZE        (10u)
+#define RX_BUFF_SIZE        (16u)
 
+#define UM_IDLE             (0u)
+#define UM_PACKREADY        (1u)
+#define UM_RESPOND          (2u)
+
+/* Master states */
+#define UM_ERROR               (0u)
+#define UM_COMPLETE            (1u)
+#define UM_BUSY                (2u)
+
+/* Protocol Timeout (timer ticks) */
+#define UM_TIMEOUT             (1000u)
 
 /*******************************************************************************
 * Function Prototypes
