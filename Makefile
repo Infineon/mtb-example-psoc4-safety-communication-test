@@ -7,7 +7,7 @@
 #
 ################################################################################
 # \copyright
-# Copyright 2018-2024, Cypress Semiconductor Corporation (an Infineon company)
+# Copyright 2018-2025, Cypress Semiconductor Corporation (an Infineon company)
 # SPDX-License-Identifier: Apache-2.0
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -100,10 +100,8 @@ SOURCES=
 # directories (without a leading -I).
 INCLUDES=
 
-CY_IGNORE+=$(wildcard $(SEARCH_mtb-stl)/*Clock.*) $(wildcard $(SEARCH_mtb-stl)/*Interrupt.*) $(wildcard $(SEARCH_mtb-stl)/*UART_Debug.*)
-
 # Add additional defines to the build process (without a leading -D).
-DEFINES=CY_USING_HAL
+DEFINES=
 
 # Select softfp or hardfp floating point. Default is softfp.
 VFP_SELECT=

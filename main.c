@@ -12,7 +12,7 @@
 * Related Document:See README.md
 *
 ********************************************************************************
-* Copyright 2023-2024, Cypress Semiconductor Corporation (an Infineon company) or
+* Copyright 2023-2025, Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
@@ -47,10 +47,9 @@
 /*******************************************************************************
 * Includes
 ********************************************************************************/
-
+#include <stdio.h>
 #include "cy_pdl.h"
 #include "cybsp.h"
-#include "cy_retarget_io.h"
 #include "SelfTest_UART_slave_message.h"
 #include "SelfTest_UART_master_message.h"
 
@@ -77,6 +76,8 @@
 
 /* Protocol Timeout (timer ticks) */
 #define UM_TIMEOUT             (1000u)
+
+char uart_print_buff[100]={0};
 
 /*******************************************************************************
 * Function Prototypes
@@ -116,6 +117,7 @@ int main(void)
     uint16_t count = 0u;
     uint8_t slave_resp_res;
     cy_rslt_t result;
+    cy_stc_scb_uart_context_t CYBSP_UART_context;
 
     /* Initialize the device and board peripherals */
     result = cybsp_init();
@@ -129,20 +131,17 @@ int main(void)
     /* Enable global interrupts */
     __enable_irq();
     
-    /* Initialize retarget-io to use the debug UART port */
-    result = cy_retarget_io_init(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX, CY_RETARGET_IO_BAUDRATE);
-    if (result != CY_RSLT_SUCCESS)
-    {
-        CY_ASSERT(0);
-    }
+    /* Configure and enable the UART peripheral */
+    Cy_SCB_UART_Init(CYBSP_UART_HW, &CYBSP_UART_config, &CYBSP_UART_context);
+    Cy_SCB_UART_Enable(CYBSP_UART_HW);
 
     /* Init HW for UART Protocol test and Setup ISRs*/
     Timeout_Counter_Init();
     Protocol_Test_UART_Init();
 
     /* \x1b[2J\x1b[;H - ANSI ESC sequence for clear screen */
-    printf("\x1b[2J\x1b[;H");
-    printf("\r\nClass-B Safety Test: Communication Protocol\r\n");
+    Cy_SCB_UART_PutString(CYBSP_UART_HW, "\x1b[2J\x1b[;H");
+    Cy_SCB_UART_PutString(CYBSP_UART_HW, "\r\nClass-B Safety Test: Communication Protocol\r\n");
 
     /* Init UART Slave and Master Protocol Structures and Enable the UART HW */
     UartMesMaster_Init(CYBSP_DUT_UART_MASTER_HW, CYBSP_TIMER_UART_MASTER_HW, CYBSP_TIMER_UART_MASTER_NUM);
@@ -162,7 +161,7 @@ int main(void)
                 /* No respond timeout error */
                 if (count > 0u)
                 {
-                    printf("\r\nCommunication Protocol test: error \r\n");
+                    Cy_SCB_UART_PutString(CYBSP_UART_HW, "\r\nCommunication Protocol test: error \r\n");
 
                     /* For demo purposes in case of error detection
                     * message is printed to UART Debug and code execution
@@ -173,7 +172,9 @@ int main(void)
                 }
             }
 
-            printf("\rCommunication Protocol testing at run-time... count=%d", count);
+            /* Print test counter */
+            sprintf(uart_print_buff, "\rCommunication Protocol testing at run-time... count=%d", count);
+            Cy_SCB_UART_PutString(CYBSP_UART_HW, uart_print_buff);
 
             /* Send new packet */
             UartMesMaster_DataProc(2u, txd, RX_TEST_SIZE, rxd, sizeof(rxd));
